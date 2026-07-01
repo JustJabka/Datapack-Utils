@@ -24,23 +24,26 @@ public class EvalCommand {
                             String expressionString = StringArgumentType.getString(context, "expression");
                             Expression expression = new Expression(expressionString);
 
-                            return calcExpression(expression, 1);
+                            return calcExpression(context.getSource(), expression, 1);
                         })
                         .then(Commands.argument("scale", DoubleArgumentType.doubleArg()).executes(context -> {
                             String expressionString = StringArgumentType.getString(context, "expression");
                             Expression expression = new Expression(expressionString);
                             double scale = DoubleArgumentType.getDouble(context, "scale");
 
-                            return calcExpression(expression, scale);
+                            return calcExpression(context.getSource(), expression, scale);
                         }))
                 );
     }
 
-    private static int calcExpression(Expression expression, double scale) throws CommandSyntaxException {
+    private static int calcExpression(CommandSourceStack source, Expression expression, double scale) throws CommandSyntaxException {
         try {
             double result = expression.evaluate().getNumberValue().doubleValue();
             double scaledResult = result * scale;
-            return (int) Math.round(scaledResult);
+            int roundedResult = (int) Math.round(scaledResult);
+
+            source.sendSuccess(() -> Component.literal("Expression result: %s".formatted(roundedResult)), true);
+            return roundedResult;
         } catch (EvaluationException | ParseException e) {
             throw ERROR_INVALID_EXPRESSION.create(e.getMessage());
         }
