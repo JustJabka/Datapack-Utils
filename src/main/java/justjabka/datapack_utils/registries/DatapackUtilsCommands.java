@@ -25,6 +25,7 @@ public class DatapackUtilsCommands {
             dispatcher.register(FreezeCommand.register());
             dispatcher.register(AirCommand.register());
             dispatcher.register(FoodCommand.register());
+            dispatcher.register(ProvokeCommand.register());
 
             if (executeNode instanceof LiteralCommandNode<CommandSourceStack> vanillaExecute) {
                 LiteralCommandNode<CommandSourceStack> raycastNode = ExecuteRaycastCommand.register(vanillaExecute);

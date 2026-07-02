@@ -3,7 +3,8 @@
   "package": "justjabka.datapack_utils.mixins",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "EntityDataAccessorMixin"
+    "EntityDataAccessorMixin",
+    "PanicGoalMixin"
   ],
   "injectors": {
     "defaultRequire": 1
