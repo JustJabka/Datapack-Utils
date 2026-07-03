@@ -1,4 +1,4 @@
-package justjabka.datapack_utils.Types;
+package justjabka.datapack_utils.types;
 
 public enum Operation {
     ADD,
