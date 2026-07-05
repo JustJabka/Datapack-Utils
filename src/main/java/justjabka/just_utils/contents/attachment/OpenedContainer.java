@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.item.ItemStack;
 
@@ -23,7 +22,7 @@ public class OpenedContainer {
     );
 
     private static final AttachmentType<List<ItemStackWithSlot>> ITEMS = AttachmentRegistry.create(
-            Identifier.fromNamespaceAndPath(JustUtils.MOD_ID, "items"),
+            JustUtils.id("items"),
             builder -> builder
                     .initializer(ArrayList::new)
                     .persistent(ItemStackWithSlot.CODEC.listOf())

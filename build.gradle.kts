@@ -1,10 +1,11 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'maven-publish'
+	id("net.fabricmc.fabric-loom")
+	`maven-publish`
+	id("com.gradleup.shadow") version "9.4.3"
 }
 
-version = project.mod_version
-group = project.maven_group
+version = providers.gradleProperty("mod_version").get()
+group = providers.gradleProperty("maven_group").get()
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -14,28 +15,43 @@ repositories {
 	// for more information about repositories.
 }
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	implementation "com.ezylang:EvalEx:3.6.2"
-	include "com.ezylang:EvalEx:3.6.2"
+configurations {
+	val shadow = shadow.get()
+	implementation.get().extendsFrom(shadow)
 }
 
-processResources {
-	def version = project.version
-	inputs.property "version", version
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
+	implementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
+
+	shadow("com.ezylang:EvalEx:3.6.2")
+}
+
+tasks.shadowJar {
+	archiveClassifier = ""
+
+	configurations = listOf(project.configurations.shadow.get())
+
+	relocate("com.ezylang.evalex", "justjabka.libs.evalex")
+
+	minimize()
+}
+
+tasks.processResources {
+	val version = version
+	inputs.property("version", version)
 
 	filesMatching("fabric.mod.json") {
-		expand "version": version
+		expand("version" to version)
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+tasks.withType<JavaCompile>().configureEach {
+	options.release = 25
 }
 
 java {
@@ -48,20 +64,20 @@ java {
 	targetCompatibility = JavaVersion.VERSION_25
 }
 
-jar {
-	def projectName = project.name
-	inputs.property "projectName", projectName
+tasks.jar {
+	val projectName = project.name
+	inputs.property("projectName", projectName)
 
 	from("LICENSE") {
-		rename { "${it}_$projectName"}
+		rename { "${it}_$projectName" }
 	}
 }
 
 // configure the maven publication
 publishing {
 	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
+		register<MavenPublication>("mavenJava") {
+			from(components["java"])
 		}
 	}
 
